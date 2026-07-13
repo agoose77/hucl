@@ -1,0 +1,32 @@
+import argparse
+import logging
+
+from ..flows.stop import ensure_api_url, stop_server_sansio
+from ..drivers.sync import sync_driver
+
+
+def setup_cli(parser: argparse.ArgumentParser):
+    parser.add_argument("url", help="JupyterHub API URL")
+    parser.add_argument("token", help="JupyterHub API Token")
+    parser.add_argument("--server", help="Server name")
+    parser.add_argument(
+        "-v", "--verbose", help="Turn on verbose debugging", action="store_true"
+    )
+    parser.add_argument(
+        "--remove",
+        help="Delete the server once it has stopped",
+        action="store_true",
+    )
+    parser.set_defaults(impl=handle_args)
+    return parser
+
+
+def handle_args(args: argparse.Namespace):
+    logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO)
+
+    # Arg processing
+    api_url = ensure_api_url(args.url)
+    server_name = args.server
+    api_token = args.token
+
+    sync_driver(stop_server_sansio(api_url, api_token, server_name, args.remove))

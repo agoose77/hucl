@@ -10,7 +10,6 @@ from ..drivers.sansio import SansioImpl, Read, ReadLine, Sleep
 
 logger = logging.getLogger(__name__)
 
-DATA_PREFIX = b"data: "
 RANDOM_REQUESTS_PER_MIN = 10
 
 
@@ -19,8 +18,7 @@ type APIUrl = NewType("APIUrl", str)
 
 class State(enum.StrEnum):
     check_status = enum.auto()
-    start_server = enum.auto()
-    wait_for_start = enum.auto()
+    stop_server = enum.auto()
     wait_for_stop = enum.auto()
 
 
@@ -33,15 +31,14 @@ def get_server_api_url(api_url: APIUrl, user_name: str, server_name: str | None)
     return f"{api_url}/users/{user_name}{server_path}"
 
 
-def start_server_sansio(
+def stop_server_sansio(
     api_url: APIUrl,
     api_token: str,
     server_name: str | None,
-    profile_options: dict[str, str],
+    remove: bool,
 ) -> SansioImpl:
     """
-    Basic reconciliation loop for starting a (named) server on a JupyterHub.
-    Existing servers with the same name (or default, not given) will be re-used.
+    Basic reconciliation loop for stopping a (named) server on a JupyterHub.
 
     :param api_url: URL for JupyterHub API endpoint
     """
@@ -71,66 +68,36 @@ def start_server_sansio(
 
                 # Transition
                 match existing_server:
+                    # Doesn't exist
                     case None:
-                        state = State.start_server
-                    case {"pending": "start", **rest}:
-                        state = State.wait_for_start
+                        # Done
+                        return
                     case {"pending": "stop", **rest}:
                         state = State.wait_for_stop
                     case _:
-                        assert existing_server["ready"]
-                        return existing_server["url"]
+                        # Running
+                        state = State.stop_server
 
-            case State.start_server:
+            case State.stop_server:
                 # Try to start server
                 resp = yield urllib.request.Request(
                     get_server_api_url(api_url, user_name, server_name),
-                    method="POST",
-                    data=json.dumps(profile_options).encode("utf-8"),
+                    method="DELETE",
+                    data=json.dumps({"remove": remove}).encode("utf-8"),
                     headers={**auth_headers, "Content-Type": "application/json"},
                 )
 
                 # Handle response
                 match resp.status:
                     # Server already running
-                    case 201:
-                        state = State.check_status
                     case 202:
-                        state = State.wait_for_start
-                    case 429:
-                        retry_after = resp.headers.get("Retry-After")
-                        delay = (
-                            random.expovariate(RANDOM_REQUESTS_PER_MIN / 60)
-                            if retry_after is None
-                            else float(retry_after)
-                        )
-                        logger.info(
-                            f"Server asked us to back off, waiting for {delay:.1f} seconds"
-                        )
-                        yield Sleep(delay)
+                        # Server stopping
+                        state = State.wait_for_stop
+                    case 204:
+                        # Server already stopped (but not removed)
+                        return
                     case _:
                         raise RuntimeError(resp.status)
-
-            case State.wait_for_start:
-                # Get URL
-                resp = yield (
-                    urllib.request.Request(
-                        f"{get_server_api_url(api_url, user_name, server_name)}/progress",
-                        method="GET",
-                        headers=auth_headers,
-                    )
-                )
-                while True:
-                    line = yield ReadLine(resp)
-                    if not line.startswith(DATA_PREFIX):
-                        continue
-
-                    logger.debug(line.decode())
-
-                    # Load JSON response line
-                    line_data = json.loads(line[len(DATA_PREFIX) :].decode())
-                    if line_data.get("ready"):
-                        return line_data["url"]
 
             case State.wait_for_stop:
                 delay = random.expovariate(RANDOM_REQUESTS_PER_MIN / 60)

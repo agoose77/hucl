@@ -5,7 +5,8 @@ import argparse
 import logging
 import os
 
-from .start import setup_cli
+from .start import setup_cli as add_start
+from .stop import setup_cli as add_stop
 
 
 def main(argv: list[str] = None):
@@ -16,7 +17,8 @@ def main(argv: list[str] = None):
 
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(required=True)
-    setup_cli(subparsers.add_parser("start"))
+    add_start(subparsers.add_parser("start"))
+    add_stop(subparsers.add_parser("stop"))
     args = parser.parse_args()
     args.impl(args)
 
