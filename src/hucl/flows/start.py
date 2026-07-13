@@ -32,6 +32,7 @@ def get_server_api_url(api_url: APIUrl, user_name: str, server_name: str | None)
 
 
 def start_server_sansio(
+    *,
     api_url: APIUrl,
     api_token: str,
     user_name: str = None,

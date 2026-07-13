@@ -34,5 +34,6 @@ def sync_driver(loop: SansioImpl):
                     assert isinstance(closable, NetworkResponse)
                     closable._impl.close()
                 case urllib.request.Request():
+                    print(request.get_full_url())
                     f = stack.enter_context(urllib.request.urlopen(request))
                     response = NetworkResponse(f.status, f.headers, f)
