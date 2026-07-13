@@ -1,0 +1,66 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "jupyterhub-client"
+dynamic = ["version"]
+description = 'A simple client to initialise a JupyterHub server'
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+keywords = []
+authors = [
+  { name = "Angus Hollands", email = "goosey15@gmail.com" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = [
+  "click",
+]
+
+[project.urls]
+Documentation = "https://github.com/Angus Hollands/jupyterhub-client#readme"
+Issues = "https://github.com/Angus Hollands/jupyterhub-client/issues"
+Source = "https://github.com/Angus Hollands/jupyterhub-client"
+
+[project.scripts]
+jupyterhub-client = "jupyterhub_client.cli:jupyterhub_client"
+
+[tool.hatch.version]
+path = "src/jupyterhub_client/__about__.py"
+
+[tool.hatch.envs.types]
+extra-dependencies = [
+  "mypy>=1.0.0",
+]
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/jupyterhub_client tests}"
+
+[tool.coverage.run]
+source_pkgs = ["jupyterhub_client", "tests"]
+branch = true
+parallel = true
+omit = [
+  "src/jupyterhub_client/__about__.py",
+]
+
+[tool.coverage.paths]
+jupyterhub_client = ["src/jupyterhub_client", "*/jupyterhub-client/src/jupyterhub_client"]
+tests = ["tests", "*/jupyterhub-client/tests"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
