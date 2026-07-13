@@ -24,6 +24,10 @@ classifiers = [
 dependencies = [
 ]
 
+[project.optional-dependencies]
+async = [
+  "aiohttp",
+]
 [dependency-groups]
 test = ["pytest>7", "coverage"]
 
