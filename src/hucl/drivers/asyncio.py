@@ -15,12 +15,12 @@ async def async_driver(loop: SansioImpl):
     async with aiohttp.ClientSession() as session, contextlib.AsyncExitStack() as stack:
         response = None
         while True:
-            logger.debug("Send event response", response)
+            logger.debug(f"Send event response: {type(response)}")
             try:
                 request = loop.send(response)
             except StopIteration as err:
                 return err.value
-            logger.debug("Receive event", request)
+            logger.debug(f"Receive event: {type(response)}")
 
             response = None
             match request:

@@ -13,12 +13,12 @@ def sync_driver(loop: SansioImpl):
     response = None
     with contextlib.ExitStack() as stack:
         while True:
-            logger.debug(f"Send event response: {response!r}")
+            logger.debug(f"Send event response: {type(response)}")
             try:
                 request = loop.send(response)
             except StopIteration as err:
                 return err.value
-            logger.debug(f"Receive event: {request!r}")
+            logger.debug(f"Receive event: {type(request)}")
 
             response = None
             match request:
