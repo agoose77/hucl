@@ -74,7 +74,7 @@ def start_server_sansio(
                 match existing_server:
                     case None:
                         state = State.start_server
-                    case {"pending": "spawn", **rest}:
+                    case {"pending": "start", **rest}:
                         state = State.wait_for_start
                     case {"pending": "stop", **rest}:
                         state = State.wait_for_stop

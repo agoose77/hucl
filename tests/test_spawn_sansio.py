@@ -1,4 +1,4 @@
-from jupyterhub_client.flows.spawn import start_server_sansio
+from jupyterhub_client.flows.start import start_server_sansio
 from jupyterhub_client.drivers.sansio import Read, ReadLine, NetworkResponse, Sleep
 import urllib.request
 import json

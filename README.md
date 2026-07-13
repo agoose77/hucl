@@ -16,6 +16,11 @@
 pip install jupyterhub-client
 ```
 
+## Usage
+```bash
+jupyterhub-client start https://my-hub.com/hub/api <TOKEN>
+```
+
 ## License
 
 `jupyterhub-client` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
