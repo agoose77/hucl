@@ -19,6 +19,11 @@ class State(enum.StrEnum):
     wait_for_stop = enum.auto()
 
 
+def get_user_api_url(api_url: APIUrl, user_name: str | None) -> str:
+    user_path = "/user" if user_name is None else f"/users/{user_name}"
+    return f"{api_url}{user_path}"
+
+
 def get_server_api_url(api_url: APIUrl, user_name: str, server_name: str | None) -> str:
     server_path = "/server" if server_name is None else f"/servers/{server_name}"
     return f"{api_url}/users/{user_name}{server_path}"
@@ -27,8 +32,9 @@ def get_server_api_url(api_url: APIUrl, user_name: str, server_name: str | None)
 def stop_server_sansio(
     api_url: APIUrl,
     api_token: str,
-    server_name: str | None,
-    remove: bool,
+    user_name: str = None,
+    server_name: str = None,
+    remove: bool = False,
 ) -> SansioImpl:
     """
     Basic reconciliation loop for stopping a (named) server on a JupyterHub.
@@ -41,7 +47,7 @@ def stop_server_sansio(
     state = State.check_status
 
     # State data (side effects)
-    user_name: str
+    resolved_user_name: str
 
     while True:
         logger.debug(state)
@@ -49,7 +55,7 @@ def stop_server_sansio(
             case State.check_status:
                 # Get current user
                 resp = yield urllib.request.Request(
-                    f"{api_url}/user", headers=auth_headers
+                    f"{api_url}/users/", headers=auth_headers
                 )
                 content = yield Read(resp)
 
@@ -57,7 +63,7 @@ def stop_server_sansio(
 
                 # Is the server known of?
                 existing_server = user_model["servers"].get(server_name or "")
-                user_name = user_model["name"]
+                resolved_user_name = user_model["name"]
 
                 # Transition
                 match existing_server:
@@ -74,7 +80,7 @@ def stop_server_sansio(
             case State.stop_server:
                 # Try to start server
                 resp = yield urllib.request.Request(
-                    get_server_api_url(api_url, user_name, server_name),
+                    get_server_api_url(api_url, resolved_user_name, server_name),
                     method="DELETE",
                     data=json.dumps({"remove": remove}).encode("utf-8"),
                     headers={**auth_headers, "Content-Type": "application/json"},
