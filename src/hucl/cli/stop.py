@@ -1,7 +1,8 @@
 import argparse
 import logging
 
-from ..flows.stop import ensure_api_url, stop_server_sansio
+from ..flows.shared import ensure_api_url
+from ..flows.stop import stop_server_sansio
 from ..drivers.sync import sync_driver
 
 

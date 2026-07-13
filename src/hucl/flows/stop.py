@@ -4,26 +4,19 @@ import json
 import random
 import enum
 import logging
-from typing import cast, NewType
 
-from ..drivers.sansio import SansioImpl, Read, ReadLine, Sleep
+from .shared import APIUrl
+from ..drivers.sansio import SansioImpl, Read, Sleep
 
 logger = logging.getLogger(__name__)
 
 RANDOM_REQUESTS_PER_MIN = 10
 
 
-type APIUrl = NewType("APIUrl", str)
-
-
 class State(enum.StrEnum):
     check_status = enum.auto()
     stop_server = enum.auto()
     wait_for_stop = enum.auto()
-
-
-def ensure_api_url(maybe_url: str) -> APIUrl:
-    return cast(APIUrl, maybe_url.rstrip("/"))
 
 
 def get_server_api_url(api_url: APIUrl, user_name: str, server_name: str | None) -> str:
