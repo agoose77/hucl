@@ -4,6 +4,6 @@
 import sys
 
 if __name__ == "__main__":
-    from jupyterhub_client.cli import jupyterhub_client
+    from hucl.cli import hucl
 
-    sys.exit(jupyterhub_client())
+    sys.exit(hucl())

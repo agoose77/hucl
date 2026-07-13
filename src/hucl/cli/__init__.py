@@ -11,7 +11,7 @@ from .stop import setup_cli as add_stop
 
 def main(argv: list[str] = None):
     logging.basicConfig(
-        filename="jupyterhub-client.log",
+        filename="hucl.log",
         level=os.environ.get("JUPYTERHUB_CLIENT_LOGLEVEL", "INFO"),
     )
 

@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "jupyterhub-client"
+name = "hucl"
 dynamic = ["version"]
 description = 'A simple client to initialise a JupyterHub server'
 readme = "README.md"
@@ -28,34 +28,34 @@ dependencies = [
 test = ["pytest>7", "coverage"]
 
 [project.urls]
-Documentation = "https://github.com/Angus Hollands/jupyterhub-client#readme"
-Issues = "https://github.com/Angus Hollands/jupyterhub-client/issues"
-Source = "https://github.com/Angus Hollands/jupyterhub-client"
+Documentation = "https://github.com/Angus Hollands/hucl#readme"
+Issues = "https://github.com/Angus Hollands/hucl/issues"
+Source = "https://github.com/Angus Hollands/hucl"
 
 [project.scripts]
-jupyterhub-client = "jupyterhub_client.cli:main"
+hucl = "hucl.cli:main"
 
 [tool.hatch.version]
-path = "src/jupyterhub_client/__about__.py"
+path = "src/hucl/__about__.py"
 
 [tool.hatch.envs.types]
 extra-dependencies = [
   "mypy>=1.0.0",
 ]
 [tool.hatch.envs.types.scripts]
-check = "mypy --install-types --non-interactive {args:src/jupyterhub_client tests}"
+check = "mypy --install-types --non-interactive {args:src/hucl tests}"
 
 [tool.coverage.run]
-source_pkgs = ["jupyterhub_client", "tests"]
+source_pkgs = ["hucl", "tests"]
 branch = true
 parallel = true
 omit = [
-  "src/jupyterhub_client/__about__.py",
+  "src/hucl/__about__.py",
 ]
 
 [tool.coverage.paths]
-jupyterhub_client = ["src/jupyterhub_client", "*/jupyterhub-client/src/jupyterhub_client"]
-tests = ["tests", "*/jupyterhub-client/tests"]
+hucl = ["src/hucl", "*/hucl/src/hucl"]
+tests = ["tests", "*/hucl/tests"]
 
 [tool.coverage.report]
 exclude_lines = [
