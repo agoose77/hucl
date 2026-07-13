@@ -9,6 +9,18 @@ from .sansio import SansioImpl, Sleep, Read, ReadLine, Close, NetworkResponse
 logger = logging.getLogger(__name__)
 
 
+class SilentErrorHandler(urllib.request.HTTPErrorProcessor):
+    """Allow clients to handle network errors as results"""
+
+    def http_response(self, request, response):
+        return response
+
+    https_response = http_response
+
+
+opener = urllib.request.build_opener(SilentErrorHandler())
+
+
 def sync_driver(loop: SansioImpl):
     response = None
     with contextlib.ExitStack() as stack:
@@ -34,5 +46,5 @@ def sync_driver(loop: SansioImpl):
                     assert isinstance(closable, NetworkResponse)
                     closable._impl.close()
                 case urllib.request.Request():
-                    f = stack.enter_context(urllib.request.urlopen(request))
+                    f = stack.enter_context(opener.open(request))
                     response = NetworkResponse(f.status, f.headers, f)
