@@ -4,12 +4,12 @@ import urllib.request
 import urllib.parse
 import logging
 
-from .sansio import StateMachineType, Sleep, Read, ReadLine, Close
+from .sansio import SansioImpl, Sleep, Read, ReadLine, Close, NetworkResponse
 
 logger = logging.getLogger(__name__)
 
 
-async def async_driver(loop: StateMachineType):
+async def async_driver(loop: SansioImpl):
     import aiohttp.client
 
     async with aiohttp.ClientSession() as session, contextlib.AsyncExitStack() as stack:
@@ -27,13 +27,13 @@ async def async_driver(loop: StateMachineType):
                 case Sleep(duration_s):
                     await asyncio.sleep(duration_s)
                 case Read(readable):
-                    assert isinstance(readable, aiohttp.client.ClientResponse)
-                    response = await readable.content.read()
+                    assert isinstance(readable, NetworkResponse)
+                    response = await readable._impl.content.read()
                 case ReadLine(readable):
-                    assert isinstance(readable, aiohttp.client.ClientResponse)
-                    response = await readable.content.readline()
+                    assert isinstance(readable, NetworkResponse)
+                    response = await readable._impl.content.readline()
                 case Close(closable):
-                    assert isinstance(readable, aiohttp.client.ClientResponse)
+                    assert isinstance(readable._impl, NetworkResponse)
                     closable.close()
                 case urllib.request.Request():
                     resp = await stack.enter_async_context(
@@ -44,4 +44,4 @@ async def async_driver(loop: StateMachineType):
                             data=request.data,
                         )
                     )
-                    response = (resp.status, resp)
+                    response = NetworkResponse(resp.status, resp.headers, resp)

@@ -24,6 +24,13 @@ class Sleep:
     duration_s: Any
 
 
+@dataclasses.dataclass
+class NetworkResponse:
+    status: int
+    headers: dict
+    _impl: Any
+
+
 type Request = Sleep | Read | ReadLine | Close | urllib.request.Request
-type Response = bytes | bytearray | None
-type StateMachineType = Generator[Request, Response, str]
+type Response = bytes | bytearray | NetworkResponse | None
+type SansioImpl = Generator[Request, Response, str]

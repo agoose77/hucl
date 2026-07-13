@@ -1,33 +1,38 @@
 import urllib.request
 import urllib.parse
+import contextlib
 import logging
 import time
 
-from .sansio import StateMachineType, Sleep, Read, ReadLine, Close
+from .sansio import SansioImpl, Sleep, Read, ReadLine, Close, NetworkResponse
 
 logger = logging.getLogger(__name__)
 
 
-def sync_driver(loop: StateMachineType):
+def sync_driver(loop: SansioImpl):
     response = None
-    while True:
-        logger.debug("Send event response", response)
-        try:
-            request = loop.send(response)
-        except StopIteration as err:
-            return err.value
-        logger.debug("Receive event", request)
+    with contextlib.ExitStack() as stack:
+        while True:
+            logger.debug(f"Send event response: {response!r}")
+            try:
+                request = loop.send(response)
+            except StopIteration as err:
+                return err.value
+            logger.debug(f"Receive event: {request!r}")
 
-        response = None
-        match request:
-            case Sleep(duration_s):
-                time.sleep(duration_s)
-            case Read(readable):
-                response = readable.read()
-            case Close(closable):
-                closable.close()
-            case ReadLine(readable):
-                response = readable.readline()
-            case urllib.request.Request():
-                f = urllib.request.urlopen(request)
-                response = (f.status, f)
+            response = None
+            match request:
+                case Sleep(duration_s):
+                    time.sleep(duration_s)
+                case Read(readable):
+                    assert isinstance(readable, NetworkResponse)
+                    response = readable._impl.read()
+                case ReadLine(readable):
+                    assert isinstance(readable, NetworkResponse)
+                    response = readable._impl.readline()
+                case Close(closable):
+                    assert isinstance(closable, NetworkResponse)
+                    closable._impl.close()
+                case urllib.request.Request():
+                    f = stack.enter_context(urllib.request.urlopen(request))
+                    response = NetworkResponse(f.status, f.headers, f)

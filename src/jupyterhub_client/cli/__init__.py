@@ -1,12 +1,25 @@
 # SPDX-FileCopyrightText: 2026-present Angus Hollands <goosey15@gmail.com>
 #
 # SPDX-License-Identifier: MIT
-import click
+import argparse
+import logging
+import os
 
-from jupyterhub_client.__about__ import __version__
+from .spawn import setup_cli
 
 
-@click.group(context_settings={"help_option_names": ["-h", "--help"]}, invoke_without_command=True)
-@click.version_option(version=__version__, prog_name="jupyterhub-client")
-def jupyterhub_client():
-    click.echo("Hello world!")
+def main(argv: list[str] = None):
+    logging.basicConfig(
+        filename="jupyterhub-client.log",
+        level=os.environ.get("JUPYTERHUB_CLIENT_LOGLEVEL", "INFO"),
+    )
+
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers(required=True)
+    setup_cli(subparsers.add_parser("spawn"))
+    args = parser.parse_args()
+    args.impl(args)
+
+
+if __name__ == "__main__":
+    main()

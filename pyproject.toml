@@ -22,8 +22,10 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
-  "click",
 ]
+
+[dependency-groups]
+test = ["pytest>7", "coverage"]
 
 [project.urls]
 Documentation = "https://github.com/Angus Hollands/jupyterhub-client#readme"
@@ -31,7 +33,7 @@ Issues = "https://github.com/Angus Hollands/jupyterhub-client/issues"
 Source = "https://github.com/Angus Hollands/jupyterhub-client"
 
 [project.scripts]
-jupyterhub-client = "jupyterhub_client.cli:jupyterhub_client"
+jupyterhub-client = "jupyterhub_client.cli:main"
 
 [tool.hatch.version]
 path = "src/jupyterhub_client/__about__.py"
