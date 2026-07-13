@@ -1,6 +1,5 @@
-import urllib.reques
+import urllib.request
 import urllib.parse
-import json
 import logging
 
 from .shared import APIUrl
@@ -24,5 +23,7 @@ def delete_user_sansio(
     resp = yield urllib.request.Request(
         f"{api_url}/users/{user_name}", headers=auth_headers, method="DELETE"
     )
-    if resp.status != 204:
-        raise RuntimeError("Expected HTTP 201 Created for newly created user")
+    if resp.status not in (204, 404):
+        raise RuntimeError(
+            "Expected HTTP 204 No Content or HTTP 404 Not Found for deleted user"
+        )

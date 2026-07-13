@@ -1,8 +1,7 @@
 import argparse
-import logging
 
 from ..flows.shared import ensure_api_url
-from ..flows.start import start_server_sansio
+from ..flows.server_start import start_server_sansio
 from ..drivers.sync import sync_driver
 
 
@@ -23,7 +22,6 @@ def setup_cli(parser: argparse.ArgumentParser):
 
 
 def handle_args(args: argparse.Namespace):
-    # Arg processing
     profile_options = {k: v for k, v in (p.split("=") for p in args.profile_option)}
 
     server_url = sync_driver(
