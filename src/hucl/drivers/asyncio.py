@@ -33,8 +33,8 @@ async def async_driver(loop: SansioImpl):
                     assert isinstance(readable, NetworkResponse)
                     response = await readable._impl.content.readline()
                 case Close(closable):
-                    assert isinstance(readable._impl, NetworkResponse)
-                    closable.close()
+                    assert isinstance(closable, NetworkResponse)
+                    closable._impl.close()
                 case urllib.request.Request():
                     resp = await stack.enter_async_context(
                         session.request(

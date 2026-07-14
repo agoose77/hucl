@@ -3,13 +3,13 @@ import urllib.parse
 import logging
 
 from .shared import APIUrl
-from ..drivers.sansio import SansioImpl
+from ..drivers.sansio import SansioImpl, network_request
 
 logger = logging.getLogger(__name__)
 
 
 def delete_user_sansio(
-    *, api_url: APIUrl, api_token: str, user_name: str = None, admin: bool = False
+    *, api_url: APIUrl, api_token: str, user_name: str, admin: bool = False
 ) -> SansioImpl:
     """
     Basic reconciliation loop for deleting a user on a JupyterHub.
@@ -20,8 +20,10 @@ def delete_user_sansio(
     auth_headers = {"Authorization": f"token {api_token}"}
 
     # Get current user
-    resp = yield urllib.request.Request(
-        f"{api_url}/users/{user_name}", headers=auth_headers, method="DELETE"
+    resp = yield from network_request(
+        urllib.request.Request(
+            f"{api_url}/users/{user_name}", headers=auth_headers, method="DELETE"
+        )
     )
     if resp.status not in (204, 404):
         raise RuntimeError(

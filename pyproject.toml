@@ -29,7 +29,7 @@ async = [
   "aiohttp",
 ]
 [dependency-groups]
-test = ["pytest>7", "coverage"]
+test = ["pytest>7", "pytest-cov"]
 
 [project.urls]
 Documentation = "https://github.com/Angus Hollands/hucl#readme"
@@ -37,7 +37,7 @@ Issues = "https://github.com/Angus Hollands/hucl/issues"
 Source = "https://github.com/Angus Hollands/hucl"
 
 [project.scripts]
-hucl = "hucl.cli:main"
+hucl = "hucl.cli:hucl"
 
 [tool.hatch.version]
 path = "src/hucl/__about__.py"

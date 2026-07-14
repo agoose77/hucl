@@ -6,7 +6,8 @@ import enum
 import logging
 
 from .shared import APIUrl
-from ..drivers.sansio import SansioImpl, Read, ReadLine, Sleep
+from ..drivers.sansio import SansioImpl, read, read_line, sleep, network_request
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -35,9 +36,9 @@ def start_server_sansio(
     *,
     api_url: APIUrl,
     api_token: str,
-    user_name: str = None,
-    server_name: str = None,
-    profile_options: dict[str, str] = None,
+    user_name: Optional[str] = None,
+    server_name: Optional[str] = None,
+    profile_options: Optional[dict[str, str]] = None,
 ) -> SansioImpl:
     """
     Basic reconciliation loop for starting a (named) server on a JupyterHub.
@@ -58,10 +59,12 @@ def start_server_sansio(
         match state:
             case State.check_status:
                 # Get current user
-                resp = yield urllib.request.Request(
-                    get_user_api_url(api_url, user_name), headers=auth_headers
+                resp = yield from network_request(
+                    urllib.request.Request(
+                        get_user_api_url(api_url, user_name), headers=auth_headers
+                    )
                 )
-                content = yield Read(resp)
+                content = yield from read(resp)
 
                 user_model = json.loads(content)
 
@@ -83,13 +86,15 @@ def start_server_sansio(
 
             case State.start_server:
                 # Try to start server
-                resp = yield urllib.request.Request(
-                    get_server_api_url(api_url, resolved_user_name, server_name),
-                    method="POST",
-                    data=json.dumps(
-                        {} if profile_options is None else profile_options
-                    ).encode("utf-8"),
-                    headers={**auth_headers, "Content-Type": "application/json"},
+                resp = yield from network_request(
+                    urllib.request.Request(
+                        get_server_api_url(api_url, resolved_user_name, server_name),
+                        method="POST",
+                        data=json.dumps(
+                            {} if profile_options is None else profile_options
+                        ).encode("utf-8"),
+                        headers={**auth_headers, "Content-Type": "application/json"},
+                    )
                 )
 
                 # Handle response
@@ -109,13 +114,13 @@ def start_server_sansio(
                         logger.info(
                             f"Server asked us to back off, waiting for {delay:.1f} seconds"
                         )
-                        yield Sleep(delay)
+                        yield from sleep(delay)
                     case _:
                         raise RuntimeError(resp.status)
 
             case State.wait_for_start:
                 # Get URL
-                resp = yield (
+                resp = yield from network_request(
                     urllib.request.Request(
                         f"{get_server_api_url(api_url, resolved_user_name, server_name)}/progress",
                         method="GET",
@@ -123,7 +128,7 @@ def start_server_sansio(
                     )
                 )
                 while True:
-                    line = yield ReadLine(resp)
+                    line = yield from read_line(resp)
                     if not line.startswith(DATA_PREFIX):
                         continue
 
@@ -137,5 +142,5 @@ def start_server_sansio(
             case State.wait_for_stop:
                 delay = random.expovariate(RANDOM_REQUESTS_PER_MIN / 60)
                 logger.info(f"Waiting for server to stop for {delay:.1f} seconds")
-                yield Sleep(delay)
+                yield from sleep(delay)
                 state = State.check_status

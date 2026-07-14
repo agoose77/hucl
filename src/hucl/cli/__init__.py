@@ -10,9 +10,10 @@ from .server_stop import setup_cli as add_stop
 
 from .user_create import setup_cli as add_create_user
 from .user_delete import setup_cli as add_delete_user
+from typing import Optional
 
 
-def main(argv: list[str] = None):
+def hucl(argv: Optional[list[str]] = None):
     logging.basicConfig(
         filename="hucl.log",
         level=os.environ.get("JUPYTERHUB_CLIENT_LOGLEVEL", "INFO"),
@@ -38,4 +39,4 @@ def main(argv: list[str] = None):
 
 
 if __name__ == "__main__":
-    main()
+    hucl()

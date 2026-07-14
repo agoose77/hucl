@@ -4,13 +4,13 @@ import json
 import logging
 
 from .shared import APIUrl
-from ..drivers.sansio import SansioImpl
+from ..drivers.sansio import SansioImpl, network_request
 
 logger = logging.getLogger(__name__)
 
 
 def create_user_sansio(
-    *, api_url: APIUrl, api_token: str, user_name: str = None, admin: bool = False
+    *, api_url: APIUrl, api_token: str, user_name: str, admin: bool = False
 ) -> SansioImpl:
     """
     Basic reconciliation loop for creating a user on a JupyterHub.
@@ -21,8 +21,10 @@ def create_user_sansio(
     auth_headers = {"Authorization": f"token {api_token}"}
 
     # Get current user
-    resp = yield urllib.request.Request(
-        f"{api_url}/users/{user_name}", headers=auth_headers, method="POST"
+    resp = yield from network_request(
+        urllib.request.Request(
+            f"{api_url}/users/{user_name}", headers=auth_headers, method="POST"
+        )
     )
     if resp.status == 409:
         return
@@ -32,11 +34,13 @@ def create_user_sansio(
 
     if admin:
         # Get current user
-        resp = yield urllib.request.Request(
-            f"{api_url}/users/{user_name}",
-            data=json.dumps({"admin": True}).encode("utf-8"),
-            headers=auth_headers,
-            method="PATCH",
+        resp = yield from network_request(
+            urllib.request.Request(
+                f"{api_url}/users/{user_name}",
+                data=json.dumps({"admin": True}).encode("utf-8"),
+                headers=auth_headers,
+                method="PATCH",
+            )
         )
 
         if resp.status != 200:

@@ -6,7 +6,8 @@ import enum
 import logging
 
 from .shared import APIUrl
-from ..drivers.sansio import SansioImpl, Read, Sleep
+from ..drivers.sansio import SansioImpl, read, sleep, network_request
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -33,8 +34,8 @@ def stop_server_sansio(
     *,
     api_url: APIUrl,
     api_token: str,
-    user_name: str = None,
-    server_name: str = None,
+    user_name: Optional[str] = None,
+    server_name: Optional[str] = None,
     remove: bool = False,
 ) -> SansioImpl:
     """
@@ -55,10 +56,12 @@ def stop_server_sansio(
         match state:
             case State.check_status:
                 # Get current user
-                resp = yield urllib.request.Request(
-                    get_user_api_url(api_url, user_name), headers=auth_headers
+                resp = yield from network_request(
+                    urllib.request.Request(
+                        get_user_api_url(api_url, user_name), headers=auth_headers
+                    )
                 )
-                content = yield Read(resp)
+                content = yield from read(resp)
 
                 user_model = json.loads(content)
 
@@ -80,11 +83,13 @@ def stop_server_sansio(
 
             case State.stop_server:
                 # Try to start server
-                resp = yield urllib.request.Request(
-                    get_server_api_url(api_url, resolved_user_name, server_name),
-                    method="DELETE",
-                    data=json.dumps({"remove": remove}).encode("utf-8"),
-                    headers={**auth_headers, "Content-Type": "application/json"},
+                resp = yield from network_request(
+                    urllib.request.Request(
+                        get_server_api_url(api_url, resolved_user_name, server_name),
+                        method="DELETE",
+                        data=json.dumps({"remove": remove}).encode("utf-8"),
+                        headers={**auth_headers, "Content-Type": "application/json"},
+                    )
                 )
 
                 # Handle response
@@ -102,5 +107,5 @@ def stop_server_sansio(
             case State.wait_for_stop:
                 delay = random.expovariate(RANDOM_REQUESTS_PER_MIN / 60)
                 logger.info(f"Waiting for server to stop for {delay:.1f} seconds")
-                yield Sleep(delay)
+                yield from sleep(delay)
                 state = State.check_status
