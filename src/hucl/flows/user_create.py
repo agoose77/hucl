@@ -30,13 +30,14 @@ def create_user_sansio(
     if resp.status != 201:
         raise RuntimeError("Expected HTTP 201 Created for newly created user")
 
-    # Get current user
-    resp = yield urllib.request.Request(
-        f"{api_url}/users/{user_name}",
-        data=json.dumps({"admin": admin}).encode("utf-8"),
-        headers=auth_headers,
-        method="POST",
-    )
+    if admin:
+        # Get current user
+        resp = yield urllib.request.Request(
+            f"{api_url}/users/{user_name}",
+            data=json.dumps({"admin": True}).encode("utf-8"),
+            headers=auth_headers,
+            method="PATCH",
+        )
 
-    if resp.status == 200:
-        RuntimeError("Expected HTTP 200 OK for modified user")
+        if resp.status != 200:
+            RuntimeError("Expected HTTP 200 OK for modified user")

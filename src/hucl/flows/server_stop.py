@@ -55,7 +55,6 @@ def stop_server_sansio(
         match state:
             case State.check_status:
                 # Get current user
-                print(get_user_api_url(api_url, user_name))
                 resp = yield urllib.request.Request(
                     get_user_api_url(api_url, user_name), headers=auth_headers
                 )

@@ -1,13 +1,18 @@
-from hucl.flows.start import start_server_sansio
+from hucl.flows.server_start import start_server_sansio
 from hucl.drivers.sansio import Read, ReadLine, NetworkResponse, Sleep
 import urllib.request
 import json
 import pytest
 
 
-def test_unnamed_already_exists():
-    flow = start_server_sansio("http://my-hub.com/hub/api", "123456-a-token", None, {})
+@pytest.fixture
+def flow():
+    return start_server_sansio(
+        api_url="http://my-hub.com/hub/api", api_token="123456-a-token"
+    )
 
+
+def test_unnamed_already_exists(flow):
     # First, it should request the user model
     request = flow.send(None)
     assert isinstance(request, urllib.request.Request)
@@ -31,9 +36,7 @@ def test_unnamed_already_exists():
         )
 
 
-def test_unnamed_doesnt_exist_is_created():
-    flow = start_server_sansio("http://my-hub.com/hub/api", "123456-a-token", None, {})
-
+def test_unnamed_doesnt_exist_is_created(flow):
     # First, Flow should request the user model
     request = flow.send(None)
     assert isinstance(request, urllib.request.Request)
@@ -80,9 +83,7 @@ def test_unnamed_doesnt_exist_is_created():
         )
 
 
-def test_unnamed_doesnt_exist_is_accepted():
-    flow = start_server_sansio("http://my-hub.com/hub/api", "123456-a-token", None, {})
-
+def test_unnamed_doesnt_exist_is_accepted(flow):
     # First, Flow should request the user model
     request = flow.send(None)
     assert isinstance(request, urllib.request.Request)
@@ -143,9 +144,7 @@ def test_unnamed_doesnt_exist_is_accepted():
         flow.send(b'data: {"ready": true, "url": "/user/bob/"}')
 
 
-def test_unnamed_doesnt_exist_needs_retry():
-    flow = start_server_sansio("http://my-hub.com/hub/api", "123456-a-token", None, {})
-
+def test_unnamed_doesnt_exist_needs_retry(flow):
     # First, Flow should request the user model
     request = flow.send(None)
     assert isinstance(request, urllib.request.Request)
@@ -183,9 +182,7 @@ def test_unnamed_doesnt_exist_needs_retry():
     assert request.get_full_url() == "http://my-hub.com/hub/api/users/bob/server"
 
 
-def test_unnamed_exists_stopping():
-    flow = start_server_sansio("http://my-hub.com/hub/api", "123456-a-token", None, {})
-
+def test_unnamed_exists_stopping(flow):
     # First, Flow should request the user model
     request = flow.send(None)
     assert isinstance(request, urllib.request.Request)
