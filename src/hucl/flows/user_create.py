@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 @flow
-def create_user_sansio(
+def create_user(
     *, api_url: APIUrl, api_token: str, user_name: str, admin: bool = False
 ) -> SansioImpl:
     """

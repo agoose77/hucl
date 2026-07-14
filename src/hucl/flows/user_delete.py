@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 @flow
-def delete_user_sansio(
+def delete_user(
     *, api_url: APIUrl, api_token: str, user_name: str, admin: bool = False
 ) -> SansioImpl:
     """

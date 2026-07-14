@@ -33,7 +33,7 @@ def get_server_api_url(api_url: APIUrl, user_name: str, server_name: str | None)
 
 
 @flow
-def start_server_sansio(
+def start_server(
     *,
     api_url: APIUrl,
     api_token: str,

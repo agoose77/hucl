@@ -1,7 +1,7 @@
 import argparse
 
 from ..flows.shared import ensure_api_url
-from ..flows.server_stop import stop_server_sansio
+from ..flows.server_stop import stop_server
 from ..drivers.sync import sync_driver
 
 
@@ -24,7 +24,7 @@ def setup_cli(parser: argparse.ArgumentParser):
 
 def handle_args(args: argparse.Namespace):
     sync_driver(
-        stop_server_sansio(
+        stop_server(
             api_url=ensure_api_url(args.url),
             api_token=args.token,
             user_name=args.user,

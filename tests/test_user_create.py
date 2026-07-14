@@ -1,4 +1,4 @@
-from hucl.flows.user_create import create_user_sansio
+from hucl.flows.user_create import create_user
 from hucl.sansio import NetworkResponse
 import urllib.request
 import json
@@ -7,14 +7,14 @@ import pytest
 
 @pytest.fixture
 def flow():
-    return create_user_sansio(
+    return create_user(
         api_url="http://my-hub.com/hub/api", api_token="123456-a-token", user_name="bob"
     )
 
 
 @pytest.fixture
 def admin_flow():
-    return create_user_sansio(
+    return create_user(
         api_url="http://my-hub.com/hub/api",
         api_token="123456-a-token",
         user_name="bob",

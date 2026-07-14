@@ -1,4 +1,4 @@
-from hucl.flows.server_stop import stop_server_sansio
+from hucl.flows.server_stop import stop_server
 from hucl.sansio import Read, NetworkResponse, Sleep
 import urllib.request
 import json
@@ -7,7 +7,7 @@ import pytest
 
 @pytest.fixture
 def flow():
-    return stop_server_sansio(
+    return stop_server(
         api_url="http://my-hub.com/hub/api", api_token="123456-a-token"
     )
 

@@ -1,7 +1,7 @@
 import argparse
 
 from ..flows.shared import ensure_api_url
-from ..flows.user_delete import delete_user_sansio
+from ..flows.user_delete import delete_user
 from ..drivers.sync import sync_driver
 
 
@@ -15,7 +15,7 @@ def setup_cli(parser: argparse.ArgumentParser):
 
 def handle_args(args: argparse.Namespace):
     sync_driver(
-        delete_user_sansio(
+        delete_user(
             api_url=ensure_api_url(args.url),
             api_token=args.token,
             user_name=args.user,

@@ -1,7 +1,7 @@
 import argparse
 
 from ..flows.shared import ensure_api_url
-from ..flows.server_start import start_server_sansio
+from ..flows.server_start import start_server
 from ..drivers.sync import sync_driver
 
 
@@ -25,7 +25,7 @@ def handle_args(args: argparse.Namespace):
     profile_options = {k: v for k, v in (p.split("=") for p in args.profile_option)}
 
     server_url = sync_driver(
-        start_server_sansio(
+        start_server(
             api_url=ensure_api_url(args.url),
             api_token=args.token,
             user_name=args.user,

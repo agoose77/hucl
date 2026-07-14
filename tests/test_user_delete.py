@@ -1,4 +1,4 @@
-from hucl.flows.user_delete import delete_user_sansio
+from hucl.flows.user_delete import delete_user
 from hucl.sansio import NetworkResponse
 import urllib.request
 import pytest
@@ -6,7 +6,7 @@ import pytest
 
 @pytest.fixture
 def flow():
-    return delete_user_sansio(
+    return delete_user(
         api_url="http://my-hub.com/hub/api", api_token="123456-a-token", user_name="bob"
     )
 

@@ -31,7 +31,7 @@ def get_server_api_url(api_url: APIUrl, user_name: str, server_name: str | None)
 
 
 @flow
-def stop_server_sansio(
+def stop_server(
     *,
     api_url: APIUrl,
     api_token: str,

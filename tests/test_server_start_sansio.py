@@ -1,4 +1,4 @@
-from hucl.flows.server_start import start_server_sansio
+from hucl.flows.server_start import start_server
 from hucl.sansio import Read, ReadLine, NetworkResponse, Sleep
 import urllib.request
 import json
@@ -7,7 +7,7 @@ import pytest
 
 @pytest.fixture
 def flow():
-    return start_server_sansio(
+    return start_server(
         api_url="http://my-hub.com/hub/api", api_token="123456-a-token"
     )
 
