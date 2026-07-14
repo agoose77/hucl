@@ -1,5 +1,5 @@
 from hucl.flows.user_create import create_user_sansio
-from hucl.drivers.sansio import NetworkResponse
+from hucl.sansio import NetworkResponse
 import urllib.request
 import json
 import pytest

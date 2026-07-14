@@ -1,5 +1,5 @@
 from hucl.flows.server_stop import stop_server_sansio
-from hucl.drivers.sansio import Read, NetworkResponse, Sleep
+from hucl.sansio import Read, NetworkResponse, Sleep
 import urllib.request
 import json
 import pytest

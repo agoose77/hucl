@@ -3,13 +3,17 @@ import contextlib
 import urllib.request
 import urllib.parse
 import logging
+from typing import TypeVar
 
-from .sansio import SansioImpl, Sleep, Read, ReadLine, Close, NetworkResponse
+from ..sansio import SansioImpl, Sleep, Read, ReadLine, Close, NetworkResponse
 
 logger = logging.getLogger(__name__)
 
 
-async def async_driver(loop: SansioImpl):
+T = TypeVar("T")
+
+
+async def async_driver(flow: SansioImpl[T]) -> T:
     import aiohttp.client
 
     async with aiohttp.ClientSession() as session, contextlib.AsyncExitStack() as stack:
@@ -17,7 +21,7 @@ async def async_driver(loop: SansioImpl):
         while True:
             logger.debug(f"Send event response: {type(response)}")
             try:
-                request = loop.send(response)
+                request = flow.send(response)
             except StopIteration as err:
                 return err.value
             logger.debug(f"Receive event: {type(response)}")

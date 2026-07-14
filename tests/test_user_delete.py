@@ -1,5 +1,5 @@
 from hucl.flows.user_delete import delete_user_sansio
-from hucl.drivers.sansio import NetworkResponse
+from hucl.sansio import NetworkResponse
 import urllib.request
 import pytest
 

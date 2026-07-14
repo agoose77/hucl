@@ -3,12 +3,13 @@ import urllib.parse
 import json
 import logging
 
-from .shared import APIUrl
-from ..drivers.sansio import SansioImpl, network_request
+from .shared import APIUrl, flow
+from ..sansio import SansioImpl, network_request
 
 logger = logging.getLogger(__name__)
 
 
+@flow
 def create_user_sansio(
     *, api_url: APIUrl, api_token: str, user_name: str, admin: bool = False
 ) -> SansioImpl:

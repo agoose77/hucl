@@ -5,8 +5,8 @@ import random
 import enum
 import logging
 
-from .shared import APIUrl
-from ..drivers.sansio import SansioImpl, read, sleep, network_request
+from .shared import APIUrl, flow
+from ..sansio import SansioImpl, read, sleep, network_request
 from typing import Optional
 
 logger = logging.getLogger(__name__)
@@ -30,6 +30,7 @@ def get_server_api_url(api_url: APIUrl, user_name: str, server_name: str | None)
     return f"{api_url}/users/{user_name}{server_path}"
 
 
+@flow
 def stop_server_sansio(
     *,
     api_url: APIUrl,

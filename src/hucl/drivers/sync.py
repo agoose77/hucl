@@ -3,8 +3,9 @@ import urllib.parse
 import contextlib
 import logging
 import time
+from typing import TypeVar
 
-from .sansio import SansioImpl, Sleep, Read, ReadLine, Close, NetworkResponse
+from ..sansio import SansioImpl, Sleep, Read, ReadLine, Close, NetworkResponse
 
 logger = logging.getLogger(__name__)
 
@@ -21,13 +22,16 @@ class SilentErrorHandler(urllib.request.HTTPErrorProcessor):
 opener = urllib.request.build_opener(SilentErrorHandler())
 
 
-def sync_driver(loop: SansioImpl):
+T = TypeVar("T")
+
+
+def sync_driver(flow: SansioImpl[T]) -> T:
     response = None
     with contextlib.ExitStack() as stack:
         while True:
             logger.debug(f"Send event response: {type(response)}")
             try:
-                request = loop.send(response)
+                request = flow.send(response)
             except StopIteration as err:
                 return err.value
             logger.debug(f"Receive event: {type(request)}")
