@@ -87,12 +87,12 @@ def stop_server_sansio(
                     urllib.request.Request(
                         get_server_api_url(api_url, resolved_user_name, server_name),
                         method="DELETE",
-                        data=json.dumps({"remove": remove}).encode("utf-8"),
+                        data=json.dumps(
+                            {"remove": remove and server_name is not None}
+                        ).encode("utf-8"),
                         headers={**auth_headers, "Content-Type": "application/json"},
                     )
-                )
-
-                # Handle response
+                )  # Handle response
                 match resp.status:
                     # Server already running
                     case 202:
