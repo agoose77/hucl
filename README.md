@@ -16,10 +16,21 @@
 pip install hucl
 ```
 
-## Usage
+## CLI Usage
 ```bash
 hucl start https://my-hub.com/hub/api <TOKEN>
 ```
+
+## API Usage
+```python
+from hucl.flows import create_server
+
+
+await create_server.asyn(api_url=..., api_token=...)
+# Or
+create_server.sync(api_url=..., api_token=...)
+```
+
 
 ## License
 
