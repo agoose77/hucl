@@ -31,4 +31,7 @@ jobs:
         python -m pip install --group test 
     - name: Test with pytest
       run: |
+        mypy --install-types src/hucl
+    - name: Test with pytest
+      run: |
         pytest --cov

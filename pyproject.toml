@@ -29,7 +29,7 @@ async = [
   "aiohttp",
 ]
 [dependency-groups]
-test = ["pytest>7", "pytest-cov"]
+test = ["pytest>7", "pytest-cov", "mypy"]
 
 [project.urls]
 Documentation = "https://github.com/Angus Hollands/hucl#readme"
