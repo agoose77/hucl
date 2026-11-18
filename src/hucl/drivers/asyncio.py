@@ -1,11 +1,15 @@
+from __future__ import annotations
 import asyncio
 import contextlib
 import urllib.request
 import urllib.parse
 import logging
-from typing import TypeVar
+from typing import TypeVar, TYPE_CHECKING
 
 from ..sansio import SansioImpl, Sleep, Read, ReadLine, Close, NetworkResponse
+
+if TYPE_CHECKING:
+    import aiohttp
 
 logger = logging.getLogger(__name__)
 
@@ -13,10 +17,15 @@ logger = logging.getLogger(__name__)
 T = TypeVar("T")
 
 
-async def async_driver(flow: SansioImpl[T]) -> T:
-    import aiohttp.client
+async def async_driver(
+    flow: SansioImpl[T], *, session: aiohttp.ClientSession = None
+) -> T:
+    import aiohttp
 
-    async with aiohttp.ClientSession() as session, contextlib.AsyncExitStack() as stack:
+    async with contextlib.AsyncExitStack() as stack:
+        if session is None:
+            session = await stack.enter_async_context(aiohttp.ClientSession())
+
         response = None
         while True:
             logger.debug(f"Send event response: {type(response)}")

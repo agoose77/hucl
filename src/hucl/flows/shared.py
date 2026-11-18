@@ -1,4 +1,5 @@
-from typing import cast, NewType, ParamSpec, TypeVar, Callable, Protocol
+from typing import cast, NewType, ParamSpec, TypeVar, Protocol
+from collections.abc import Callable
 from ..sansio import SansioImpl
 from ..drivers import sync_driver, async_driver
 
